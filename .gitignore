@@ -1,0 +1,44 @@
+# Ignores IDE-specific files
+# VSCode
+.vscode/
+*.code-workspace
+#IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+# Ignores Maven target directory
+target/
+
+#Ignores environment files
+.env
+.env.*
+!.env.example
+
+#Ignores MacOS system files
+.DS_Store
+
+#Ignores Windows system files
+Thumbs.db
+desktop.ini
+ehthumbs.db
+ntuser.dat*
+ntuser.log*
+ntuser.ini
+NTUSER.DAT*
+NTUSER.LOG*
+NTUSER.INI
+NTUSER.DAT.LOG*
+
+#Ignores compiled classes
+*.class
+
+#Ignores VM crash data
+hs_err_pid*.log
+
+#Ignores archive files
+*.jar
+*.war
+*.ear
+!.mvn/wrapper/maven-wrapper.jar
