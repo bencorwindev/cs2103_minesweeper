@@ -1,11 +1,17 @@
 package cs2103.minesweeper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class Board {
     private ArrayList<ArrayList<Tile>> board = new ArrayList<>();
 
+    /** Declares a board with a set number of rows and columns, and fills it with approximately 1/6 of the board being mines.
+     * 
+     * @param rows - the number of rows in the board
+     * @param columns - the number of columns in the board
+     */
     public Board(int rows, int columns) {
         ArrayList<Integer> mineLocations = new ArrayList<>();
         Random random = new Random(System.currentTimeMillis());
@@ -28,15 +34,28 @@ public class Board {
             }
             board.add(row);
         }
-
     }
+    /** Declares a board with a set number of rows and columns, and fills it with approximately 1/6 of the board being mines. This one takes a set seed, for reproducibility.
+     * 
+     * @param rows - the number of rows in the board
+     * @param columns - the number of columns in the board
+     * @param setSeed - the seed for the RNG
+     */
     public Board(int rows, int columns, long setSeed){
         ArrayList<Integer> mineLocations = new ArrayList<>();
         Random random = new Random(setSeed);
 
         for(int i = 0; i < (rows*columns)/6; i++){
-            mineLocations.add(random.nextInt(rows * columns));
+            int mineLoc = random.nextInt(rows * columns);
+            if(!mineLocations.contains(mineLoc)){
+                mineLocations.add(mineLoc);
+            }
+            else{
+                i--;
+            }
         }
+
+        Collections.sort(mineLocations);
 
         int tileCounter = 0;
         for(int i = 0; i < rows; i++){
@@ -54,8 +73,65 @@ public class Board {
             board.add(row);
         }
     }
-
+    
+    /** Returns the board for accessibility & testing
+     * 
+     * @return the board, represented as a 2D ArrayList of Tiles (either Mines or NumberTiles)
+     */
     public ArrayList<ArrayList<Tile>> getBoard() {
         return this.board;
+    }
+
+    /** Reveals the tile at (row, col), and sets the number of mines at the location if the tile is a NumberTile
+     * 
+     * @param row - the row of the tile
+     * @param col - the column of the tile
+     * @throws NullPointerException - throws if the tile is null
+     * @throws IndexOutOfBoundsException - throws if either the row or column doesn't exist
+     */
+    public void revealTile(int row, int col) throws NullPointerException, IndexOutOfBoundsException{
+        var tile = board.get(row).get(col);
+        
+        if(row < 0 || col < 0 || row >= board.size() || col >= board.getFirst().size()){
+            throw new IndexOutOfBoundsException("Index (" + row + "," + col + ") is not a valid tile");
+        }
+        if(tile == null){
+            throw new NullPointerException("Tile is null at (" + row + "," + col + ")");
+        }
+        else if(tile instanceof NumberTile){
+            tile.reveal();
+            int mineCount = 0;
+            for(int r = row - 1; r <= row + 1; r++){
+                for(int c = col - 1; c <= col + 1; c++){
+                    if((r >= 0 && c >= 0) && (r < board.size() && c < board.get(0).size()) && board.get(r).get(c) instanceof Mine){
+                        mineCount++;
+                    }
+                }
+            }
+            ((NumberTile) tile).setMineCount(mineCount);
+        }
+        else if(tile instanceof Mine){
+            tile.reveal();
+        }
+    }
+
+    /** defines the board as a string, with N representing a number and M representing a mine
+     * 
+     * @return the board string
+     */
+    @Override
+    public String toString(){
+        String temp = "";
+        for(ArrayList<Tile> row : board){
+            for(Tile tile : row){
+                if(tile instanceof Mine){
+                    temp += "M";
+                }
+                else{
+                    temp += "N";
+                }
+            }
+        }
+        return temp;
     }
 }

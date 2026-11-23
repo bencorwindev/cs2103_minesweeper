@@ -22,4 +22,29 @@ public abstract class Tile {
      */
     abstract void reveal();
 
+    /** returns if the tile has a flag on it
+     * 
+     * @return true if the tile is flagged, false otherwise.
+     */
+    protected boolean isFlagged() {
+        return flagged;
+    }
+
+    /** returns if the tile has been revealed
+     * 
+     * @return true if the tile has been revealed, false otherwise
+     */
+    protected boolean isRevealed() {
+        return revealed;
+    }
+
+    /** sets the revealed field of the tile if it hasn't been revealed yet
+     * 
+     * @param revealed - if the tile is being revealed
+     */
+    protected void setRevealed(boolean revealed) {
+        if(!this.revealed) {
+            this.revealed = revealed;
+        }
+    }
 }
