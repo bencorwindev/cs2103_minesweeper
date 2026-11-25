@@ -2,10 +2,15 @@ package cs2103.minesweeper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Board {
     private ArrayList<ArrayList<Tile>> board = new ArrayList<>();
+    private ArrayList<Integer> mines = new ArrayList<>();
+    private ArrayList<Integer> safes = new ArrayList<>();
+    private ArrayList<Integer> tiles = new ArrayList<>();
+
 
     /** Declares a board with a set number of rows and columns, and fills it with approximately 1/6 of the board being mines.
      * 
@@ -15,10 +20,23 @@ public class Board {
     public Board(int rows, int columns) {
         ArrayList<Integer> mineLocations = new ArrayList<>();
         Random random = new Random(System.currentTimeMillis());
-
-        for(int i = 0; i < (rows*columns)/6; i++){
-            mineLocations.add(random.nextInt(rows * columns));
+        for(int i = 0; i<(rows*columns); i++) {
+            safes.add(i);
+            tiles.add(i);
         }
+        for(int i = 0; i < (rows*columns)/6; i++){
+            int mineLoc = random.nextInt(rows * columns);
+            if (!mines.contains(mineLoc)) {
+                mineLocations.add(mineLoc);
+                mines.add(mineLoc);
+                safes.remove(Integer.valueOf(mineLoc));
+            } else {
+                i--;
+            }
+        }
+
+        Collections.sort(mineLocations);
+
         int tileCounter = 0;
         for(int i = 0; i < rows; i++){
             ArrayList<Tile> row = new ArrayList<>();
@@ -44,11 +62,16 @@ public class Board {
     public Board(int rows, int columns, long setSeed){
         ArrayList<Integer> mineLocations = new ArrayList<>();
         Random random = new Random(setSeed);
-
+        for(int i = 0; i<(rows*columns); i++) {
+            safes.add(i);
+            tiles.add(i);
+        }
         for(int i = 0; i < (rows*columns)/6; i++){
             int mineLoc = random.nextInt(rows * columns);
             if(!mineLocations.contains(mineLoc)){
                 mineLocations.add(mineLoc);
+                mines.add(mineLoc);
+                safes.remove(Integer.valueOf(mineLoc));
             }
             else{
                 i--;
@@ -133,5 +156,32 @@ public class Board {
             }
         }
         return temp;
+    }
+
+    public enum GameStatus {WON, LOST, PLAYING}
+    HashMap<Integer, Boolean> revealed = new HashMap<>();
+
+    /**
+     * Checks whether the game is still playing, won, or lost.
+     *
+     * @return LOST if any mine has been revealed, WON if all non-mine tiles are revealed,
+     *         PLAYING otherwise
+     */
+    public GameStatus status() {
+        int columns = board.getFirst().size();
+        for (int loc : tiles) {
+            Tile tile = board.get(loc / columns).get(loc % columns);
+            revealed.put(loc, tile.isRevealed());
+        }
+        for(int loc: mines) {
+            if(revealed.get(loc))
+                return GameStatus.LOST;
+        }
+        for(int loc: safes) {
+            if(!revealed.get(loc)) {
+                return GameStatus.PLAYING;
+            }
+        }
+        return GameStatus.WON;
     }
 }
