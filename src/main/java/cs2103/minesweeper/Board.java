@@ -91,13 +91,15 @@ public class Board {
      */
     public void revealTile(int row, int col) throws NullPointerException, IndexOutOfBoundsException{
         var tile = board.get(row).get(col);
-        
+        // Checks if index can't exist 
         if(row < 0 || col < 0 || row >= board.size() || col >= board.getFirst().size()){
             throw new IndexOutOfBoundsException("Index (" + row + "," + col + ") is not a valid tile");
         }
+        // Checks if the tile is null
         if(tile == null){
             throw new NullPointerException("Tile is null at (" + row + "," + col + ")");
         }
+        // Reveals the number tile with a count of bordering mines
         else if(tile instanceof NumberTile){
             tile.reveal();
             int mineCount = 0;
@@ -110,6 +112,7 @@ public class Board {
             }
             ((NumberTile) tile).setMineCount(mineCount);
         }
+        // Reveals a mine, game over.
         else if(tile instanceof Mine){
             tile.reveal();
         }
